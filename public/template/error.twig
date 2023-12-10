@@ -1,0 +1,18 @@
+{% extends 'base.twig' %}
+
+{% block title %}
+  {{ title }}
+{% endblock %}
+
+{% block content %}
+  <div class="error">
+    <div class="error__title">
+      <h2 class="heading-secondary heading-secondary--error">Oops! Something went wrong</h2>
+    </div>
+    <h2 class="error__emoji">😢 🤯</h2>
+    <div class="error__msg">{{ message }}</div>
+    <div class="error__msg">
+      ERROR CODE: <span style="color:red">{{ errorCode }}</span>
+    </div>
+  </div>
+{% endblock %}

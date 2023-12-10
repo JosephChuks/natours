@@ -1,0 +1,159 @@
+{% extends 'base.twig' %}
+
+{% block head %}
+{{ parent() }}
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css" rel="stylesheet" />
+{% endblock %}
+
+{% block title %} {{title}} {% endblock %}
+
+{% block content %}
+
+<section class="section-header">
+    <div class="header__hero">
+        <div class="header__hero-overlay">
+            <img src="/img/tours/{{tour.imageCover}}" class="header__hero-img" alt="{{tour.name}}">
+        </div>
+    </div>
+    <div class="heading-box">
+        <h1 class="heading-primary">
+            <span>{{tour.name}}</span>
+        </h1>
+        <div class="heading-box__group">
+            <div class="heading-box__detail">
+                <svg class="heading-box__icon">
+                    <use xlink:href="/img/icons.svg#icon-clock"></use>
+                </svg>
+                <span class="heading-box__text">{{tour.duration}} days</span>
+            </div>
+            <div class="heading-box__detail">
+                <svg class="heading-box__icon">
+                    <use xlink:href="/img/icons.svg#icon-map-pin"></use>
+                </svg>
+                <span class="heading-box__text">{{tour.startLocation.description}}</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-description">
+    <div class="overview-box">
+        <div>
+            <div class="overview-box__group">
+                <h2 class="heading-secondary ma-bt-lg">Quick facts</h2>
+                <div class="overview-box__detail">
+                    <svg class="overview-box__icon">
+                        <use xlink:href="/img/icons.svg#icon-calendar"></use>
+                    </svg>
+                    <span class="overview-box__label">Next date</span>
+                    <span
+                        class="overview-box__text">{{tour.startDates[0].toLocaleString('en-us', {month: 'long', year: 'numeric'})}}</span>
+                </div>
+                <div class="overview-box__detail">
+                    <svg class="overview-box__icon">
+                        <use xlink:href="/img/icons.svg#icon-trending-up"></use>
+                    </svg>
+                    <span class="overview-box__label">Difficulty</span>
+                    <span class="overview-box__text">{{tour.difficulty}}</span>
+                </div>
+                <div class="overview-box__detail">
+                    <svg class="overview-box__icon">
+                        <use xlink:href="/img/icons.svg#icon-user"></use>
+                    </svg>
+                    <span class="overview-box__label">Participants</span>
+                    <span class="overview-box__text">{{tour.maxGroupSize}} people</span>
+                </div>
+                <div class="overview-box__detail">
+                    <svg class="overview-box__icon">
+                        <use xlink:href="/img/icons.svg#icon-star"></use>
+                    </svg>
+                    <span class="overview-box__label">Rating</span>
+                    <span class="overview-box__text">{{tour.ratingsAverage}} / 5</span>
+                </div>
+            </div>
+
+            <div class="overview-box__group">
+                <h2 class="heading-secondary ma-bt-lg">Your tour guides</h2>
+                {% for guide in tour.guides %}
+                <div class="overview-box__detail">
+                    <img src="/img/users/{{guide.photo}}" alt="{{guide.name}}" class="overview-box__img" />
+                    <span class="overview-box__label">
+                        {% if guide.role == 'lead-guide' %}Lead Guide{% else %}Tour Guide{% endif %}
+                    </span>
+                    <span class="overview-box__text">{{guide.name}}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="description-box">
+        <h2 class="heading-secondary ma-bt-lg">About {{tour.name}}</h2>
+        {% for description in descriptions %}
+        <p class="description__text">
+            {{description}}
+        </p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section-pictures">
+    {% for image in tour.images %}
+    <div class="picture-box">
+        <img class="picture-box__img picture-box__img--{{ loop.index }}" src="/img/tours/{{image}}"
+            alt="{{tour.name}} {{ loop.index }}" />
+    </div>
+    {% endfor %}
+</section>
+
+<section class="section-map">
+    <div id="map" data-locations='{{ locationsJSON | raw }}'></div>
+</section>
+
+<section class="section-reviews">
+    <div class="reviews">
+        {% for review in tour.reviews %}
+        <div class="reviews__card">
+            <div class="reviews__avatar">
+                <img src="/img/users/{{review.user.photo}}" alt="{{review.user.name}}" class="reviews__avatar-img" />
+                <h6 class="reviews__user">{{review.user.name}}</h6>
+            </div>
+            <p class="reviews__text">
+                {{review.review}}
+            </p>
+            <div class="reviews__rating">
+                {% for i in [1,2,3,4,5] %}
+                <svg
+                    class="reviews__star reviews__star--{% if review.rating >= i %}active{% else %}inactive{% endif %}">
+                    <use xlink:href="/img/icons.svg#icon-star"></use>
+                </svg>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section-cta">
+    <div class="cta">
+        <div class="cta__img cta__img--logo">
+            <img src="/img/logo-white.png" alt="Natours logo" class="" />
+        </div>
+        <img src="/img/tours/{{tour.images[0]}}" alt="Photo" class="cta__img cta__img--1" />
+        <img src="/img/tours/{{tour.images[1]}}" alt="Photo" class="cta__img cta__img--2" />
+
+        <div class="cta__content">
+            <h2 class="heading-secondary">What are you waiting for?</h2>
+            <p class="cta__text">
+                {{tour.duration}} days. 1 adventure. Infinite memories. Make it yours today!
+            </p>
+            {% if user %}
+            <button class="btn btn--green span-all-rows" id="book-tour" data-tour-id="{{tour.id}}">Book tour now!</button>
+            {% else %}
+            <a href="/login" class="btn btn--green span-all-rows">Login to book tour</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

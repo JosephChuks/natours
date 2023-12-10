@@ -1,0 +1,17 @@
+const express = require('express');
+const view = require('../controllers/viewsController');
+const auth = require('../controllers/authController');
+const booking = require('../controllers/bookingController');
+
+const router = express.Router();
+
+// Routes
+router.get('/', booking.createBookingCheckout, auth.isLoggedIn, view.overview);
+router.get('/login', auth.isLoggedIn, view.login);
+
+router.get('/tour/:slug', auth.isLoggedIn, view.tour);
+
+router.get('/account', auth.protect, view.account);
+router.get('/my-tours', auth.protect, view.getMyTours);
+
+module.exports = router;
